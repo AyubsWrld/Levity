@@ -1,0 +1,48 @@
+/**
+ * @file telemetry.proto
+ * @brief Protocol Buffer schema defining the Tier-1 shared telemetry domain contract.
+ *
+ * @details The documented semantic ranges are contract intent. Protobuf itself cannot enforce them,
+ * and the current Tier-1 code assumes well-formed telemetry until shared semantic validation is
+ * implemented. No timestamp/sequence is present, so cache freshness/staleness semantics are
+ * intentionally unspecified in Tier 1.
+ */
+
+syntax = "proto3";
+
+package edge.telemetry.v1;
+
+/**
+ * @brief One tracked/cued object and the coordinates required for slew-to-cue.
+ */
+message Target {
+    /**
+     * Stable target identifier. Contract intent: non-empty and at most 64 bytes; current protobuf
+     * parsing alone does not enforce that semantic constraint.
+     */
+    string uid = 1;
+
+    /** WGS-84 latitude in decimal degrees. Contract range: [-90.0, 90.0]. */
+    double latitude_deg = 2;
+
+    /** WGS-84 longitude in decimal degrees. Contract range: [-180.0, 180.0]. */
+    double longitude_deg = 3;
+
+    /**
+     * WGS-84 ellipsoidal height in metres (not MSL/AGL). Contract range: [-500.0, 20000.0]; units and
+     * datum require domain-owner confirmation before integrating real hardware.
+     */
+    double altitude_m = 4;
+}
+
+/**
+ * @brief Complete prioritized telemetry snapshot published by the Tier-1 telemetry source.
+ *
+ * @details Producer order is preserved verbatim; no component currently re-ranks or truncates the
+ * list. Contract intent is to reject a complete list containing duplicate UIDs, but that semantic
+ * validation is not yet implemented in the current Tier-1 code.
+ */
+message CuePriorityList {
+    /** Ordered target snapshot supplied by the telemetry producer. */
+    repeated Target targets = 1;
+}

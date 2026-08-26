@@ -1,0 +1,76 @@
+# Production runtime image for one Tier 1 service.
+#
+# Build one image per service by passing EDGE_SERVICE:
+#   docker build -f deploy/Dockerfile.runtime --build-arg EDGE_SERVICE=api_gateway -t edge/api-gateway .
+#
+# Each image contains exactly one executable so the three production containers stay independent and
+# small. This file is deployment configuration only; the development/integration workflow launches the
+# executables directly inside the SDK container and never uses Docker Compose.
+
+# ---------------------------------------------------------------------------------------------------
+# Stage 1: build
+# ---------------------------------------------------------------------------------------------------
+FROM ubuntu:24.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        ninja-build \
+        python3 \
+        python3-pip \
+        python3-venv \
+        pkg-config \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Conan 2 is the only third-party dependency manager for this repository.
+RUN python3 -m pip install --no-cache-dir --break-system-packages --ignore-installed distro "conan==2.31.2"
+
+WORKDIR /src
+
+# Resolve dependencies first so the layer is cached independently of source changes.
+COPY conanfile.py ./
+RUN conan profile detect --force \
+    && conan install . --output-folder=build/conan --build=missing \
+        -s build_type=Release -s compiler.cppstd=23
+
+COPY CMakeLists.txt ./
+COPY cmake ./cmake
+COPY shared ./shared
+COPY services ./services
+COPY app ./app
+
+RUN cmake -S . -B build/release -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=/src/build/conan/conan_toolchain.cmake \
+        -DSKIP_CLANG_TIDY=ON \
+        -DEDGE_BUILD_TESTS=OFF \
+        -DEDGE_BUILD_BENCHMARKS=OFF \
+    && cmake --build build/release
+
+# ---------------------------------------------------------------------------------------------------
+# Stage 2: runtime
+# ---------------------------------------------------------------------------------------------------
+FROM ubuntu:24.04 AS runtime
+
+ARG EDGE_SERVICE
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Third-party libraries are linked statically from Conan, so only the C++ runtime is required.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libstdc++6 \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 edge \
+    && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin edge
+
+# The three containers share one named tmpfs-backed volume here; a matching uid/gid in every image is
+# what lets them read and write each other's Unix-domain socket files.
+RUN mkdir -p /tmp/edge-ipc && chown edge:edge /tmp/edge-ipc && chmod 0770 /tmp/edge-ipc
+
+COPY --from=builder /src/build/release/bin/${EDGE_SERVICE} /usr/local/bin/edge-service
+
+USER edge:edge
+
+ENTRYPOINT ["/usr/local/bin/edge-service"]
