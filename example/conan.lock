@@ -1,0 +1,19 @@
+{
+    "version": "0.5",
+    "requires": [
+        "zlib/1.3.2#1cb806da49011867778ffb6ac7190fcb%1777558780.503",
+        "zeromq/4.3.5#8cc1512649270a4781c130d9a25ec37c%1778076804.003",
+        "protobuf/6.30.1#116ef680053c449ea1825d74e0638936%1768401320.6",
+        "nlohmann_json/3.11.3#45828be26eb619a2e04ca517bb7b828d%1701220705.259",
+        "gtest/1.18.0#e2507fc4efe2ec9e2db9e5c91eefab9f%1786446847.733",
+        "cppzmq/4.11.0#f9cea3fe32b242252359ded5642e92b7%1752221551.096",
+        "cpp-httplib/0.30.0#5f291b39b09d263f03b6745b5f5ad495%1767953458.666",
+        "abseil/20250814.0#c7e85f3abefdd1e05d0a8118f3320417%1761741487.631"
+    ],
+    "build_requires": [
+        "cmake/4.4.2#8a0d360635c870b1d5c675489ee25074%1786458127.662",
+        "cmake/3.31.12#173a926abc2b77f03c826b6fd6539426%1779785723.158"
+    ],
+    "python_requires": [],
+    "config_requires": []
+}
