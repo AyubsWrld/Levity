@@ -1,65 +1,117 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-
-#include <optional>
-#include <string>
-#include <vector>
-
-#include "enums.hpp"
+#include "json_util.hpp"
 
 namespace ts {
+    struct Checksum {
+        std::string algorithm;
 
-    struct ExternalIdentifier {
-        ExternalIdentifierType type = ExternalIdentifierType::Unknown;
-        std::string identifier;
-        std::vector<std::string> identifierLocator;
-        std::optional<std::string> issuingAuthority;
+        std::string checksumValue;
+    };
+
+    struct PackageVerificationCode {
+        std::string value;
+
+        std::vector<std::string> excludedFiles;
+    };
+
+    struct ExternalRef {
+        std::string referenceCategory;
+
+        std::string referenceType;
+
+        std::string referenceLocator;
+
         std::optional<std::string> comment;
     };
 
-    [[nodiscard]] auto parseExternalIdentifier( const nlohmann::json& node ) -> ExternalIdentifier;
+    struct ExternalDocumentRef {
+        std::string externalDocumentId;
+
+        Checksum checksum;
+
+        std::string spdxDocument;
+    };
+
+    using nlohmann::json;
+
+    struct ExtractedLicensingInfo {
+        std::optional<std::string> licenseId;
+
+        std::optional<std::string> extractedText;
+
+        std::optional<std::string> name;
+
+        std::vector<std::string> seeAlsos;
+
+        std::optional<std::string> comment;
+    };
 
     struct CreationInfo {
-        std::string id;
-        std::string specVersion;
-        std::vector<std::string> createdBy;
-        std::string created;
+        std::vector<std::string> creators;
+
+        std::string created;  // iso 8601 timestamp
+
+        std::optional<std::string> licenseListVersion;
+
         std::optional<std::string> comment;
     };
 
-    [[nodiscard]] auto parseCreationInfo( const nlohmann::json& node ) -> CreationInfo;
+    struct Annotation {
+        std::string annotator;
 
-    struct PositiveIntegerRange {
-        std::uint64_t begin = 0;
-        std::uint64_t end = 0;
-    };
+        std::string annotationDate;
 
-    [[nodiscard]] auto parsePositiveIntegerRange( const nlohmann::json& node ) -> std::optional<PositiveIntegerRange>;
+        std::string annotationType;
 
-    struct ElementBase {
         std::string spdxId;
-        std::string rawType;
-        std::optional<std::string> name;
-        std::optional<std::string> comment;
-        std::optional<std::string> description;
-        std::optional<std::string> summary;
-        std::string creationInfoId;
-        std::vector<ExternalIdentifier> externalIdentifiers;
-    };
 
-    auto parseElementBase( const nlohmann::json& node, ElementBase& out ) -> void;
+        std::string annotationComment;
+    };
 
     struct Relationship {
-        ElementBase base;
-        std::string from;
-        std::vector<std::string> to;
-        RelationshipType relationshipType = RelationshipType::Unknown;
-        std::optional<std::string> completeness;
-        std::optional<std::string> startTime;
-        std::optional<std::string> endTime;
+        std::string spdxElementId;
+
+        std::string relatedSpdxElement;
+
+        std::string relationshipType;
+
+        std::optional<std::string> comment;
     };
 
-    [[nodiscard]] auto parseRelationship( const nlohmann::json& node ) -> Relationship;
+    struct SnippetPointer {
+        std::string reference;
 
+        std::optional<long long> offset;
+
+        std::optional<long long> lineNumber;
+    };
+
+    struct SnippetRange {
+        SnippetPointer startPointer;
+
+        SnippetPointer endPointer;
+    };
+
+    struct Snippet {
+        std::string spdxId;
+
+        std::string snippetFromFile;
+
+        std::vector<SnippetRange> ranges;
+
+        std::optional<std::string> licenseConcluded;
+
+        std::vector<std::string> licenseInfoInSnippets;
+
+        std::optional<std::string> licenseComments;
+
+        std::optional<std::string> copyrightText;
+
+        std::optional<std::string> comment;
+
+        std::optional<std::string> name;
+
+        std::vector<std::string> attributionTexts;
+    };
 }  // namespace ts

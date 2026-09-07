@@ -8,6 +8,7 @@
 
 #include "core.hpp"
 #include "enums.hpp"
+#include "package.hpp"
 
 namespace ts {
 
@@ -34,16 +35,6 @@ namespace ts {
         std::optional<std::string> validUntilTime;
         std::vector<std::string> standardName;
         std::vector<std::string> supportLevel;  // supportType, kept raw for this pass
-    };
-
-    // Software::Package (§7.1.3)
-    struct Package {
-        SoftwareArtifactBase artifact;
-        std::optional<std::string> downloadLocation;
-        std::optional<std::string> homePage;
-        std::optional<std::string> packageUrl;
-        std::optional<std::string> packageVersion;
-        std::optional<std::string> sourceInfo;
     };
 
     // Software::File (§7.1.2)
