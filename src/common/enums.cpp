@@ -1,4 +1,4 @@
-#include "evaluator/enums.hpp"
+#include "enums.hpp"
 
 namespace ts {
 

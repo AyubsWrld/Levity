@@ -2,34 +2,81 @@
 
 #include <nlohmann/json.hpp>
 
-#include <initializer_list>
-#include <optional>
-#include <string>
-#include <vector>
+class ParseError : public std::runtime_error {
+public:
+    explicit ParseError( const std::string& msg ) : std::runtime_error( msg ) {}
+};
 
-// helpers for pulling fields out of an spdx json-ld node.
+using nlohmann::json;
 
-namespace ts::json_util {
+inline const json* find( const json& j, const char* key ) {
+    if( !j.is_object() ) return nullptr;
 
-    [[nodiscard]] auto nodeType( const nlohmann::json& node ) -> std::string;
+    auto it = j.find( key );
 
-    [[nodiscard]] auto nodeId( const nlohmann::json& node ) -> std::string;
+    if( it == j.end() || it->is_null() ) return nullptr;
 
-    [[nodiscard]] auto optStr( const nlohmann::json& node, const char* key ) -> std::optional<std::string>;
+    return &( *it );
+}
 
-    [[nodiscard]] auto reqStr( const nlohmann::json& node, const char* key, const std::string& context ) -> std::string;
+template <typename T>
 
-    [[nodiscard]] auto strArray( const nlohmann::json& node, const char* key ) -> std::vector<std::string>;
+T require( const json& j, const char* key, const char* context ) {
+    const json* v = find( j, key );
 
-    [[nodiscard]] auto optUInt( const nlohmann::json& node, const char* key ) -> std::optional<std::uint64_t>;
+    if( !v ) {
+        throw ParseError( std::string( "missing required field \"" ) + key +
 
-    [[nodiscard]] auto optStrAny( const nlohmann::json& node,
-                                  std::initializer_list<const char*> keys ) -> std::optional<std::string>;
+                          "\" in " + context );
+    }
 
-    [[nodiscard]] auto strArrayAny( const nlohmann::json& node,
-                                    std::initializer_list<const char*> keys ) -> std::vector<std::string>;
+    try {
+        return v->get<T>();
 
-    [[nodiscard]] auto findAny( const nlohmann::json& node,
-                                std::initializer_list<const char*> keys ) -> const nlohmann::json*;
+    } catch( const json::exception& e ) {
+        throw ParseError( std::string( "field \"" ) + key + "\" in " + context +
 
+                          " has wrong type: " + e.what() );
+    }
+}
+
+template <typename T>
+
+std::optional<T> opt( const json& j, const char* key, const char* context ) {
+    const json* v = find( j, key );
+
+    if( !v ) return std::nullopt;
+
+    try {
+        return v->get<T>();
+
+    } catch( const json::exception& e ) {
+        throw ParseError( std::string( "field \"" ) + key + "\" in " + context +
+
+                          " has wrong type: " + e.what() );
+    }
+}
+
+template <typename T>
+
+std::vector<T> vec( const json& j, const char* key, const char* context ) {
+    const json* v = find( j, key );
+
+    if( !v ) return {};
+
+    if( !v->is_array() ) {
+        throw ParseError( std::string( "field \"" ) + key + "\" in " + context +
+
+                          " must be an array" );
+    }
+
+    std::vector<T> out;
+
+    out.reserve( v->size() );
+
+    for( const auto& elem : *v ) {
+        out.push_back( elem.get<T>() );
+    }
+
+    return out;
 }
