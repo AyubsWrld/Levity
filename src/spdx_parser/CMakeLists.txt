@@ -5,9 +5,9 @@ add_library(tsparser
 find_package(nlohmann_json REQUIRED)
 
 target_include_directories(tsparser
-  PRIVATE
-  "${CMAKE_SOURCE_DIR}/include/spdx_parser")
+	PUBLIC
+	"${CMAKE_SOURCE_DIR}/include/spdx_parser")
 
 target_link_libraries(tsparser
-  PUBLIC
-  nlohmann_json::nlohmann_json)
+	PUBLIC
+	nlohmann_json::nlohmann_json)
