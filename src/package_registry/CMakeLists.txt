@@ -9,9 +9,11 @@ target_include_directories(tspkgregistry
   "${CMAKE_SOURCE_DIR}/include/package_registry"
   "${CMAKE_SOURCE_DIR}/include/predicate"
   "${CMAKE_SOURCE_DIR}/include/utils")
-
+
 
 target_link_libraries(tspkgregistry
+  PUBLIC
+  tsparser
+  tspredicate
   PRIVATE
-  nlohmann_json::nlohmann_json
-  tsparser)
+  nlohmann_json::nlohmann_json)

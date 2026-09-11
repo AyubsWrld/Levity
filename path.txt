@@ -1,0 +1,12 @@
+Execution status: PASSED
+  [PASS] IsStaticallyLinked
+  [PASS] HasDefinedSource
+Execution status: PASSED
+Execution status: PASSED
+Execution status: PASSED
+  [PASS] IsDynamicallyLinked
+Execution status: PASSED
+Execution status: PASSED
+Execution status: PASSED
+  [PASS] IsStaticallyLinked
+  [PASS] HasDefinedSource

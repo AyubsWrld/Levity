@@ -124,6 +124,20 @@
       "versionInfo": "1.0.0"
     },
     {
+      "SPDXID": "SPDXRef-cppzmq",
+      "copyrightText": "Copyright (c) 2016-2021 ZeroMQ community",
+      "description": "C++ binding for libzmq",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "homepage": "https://github.com/zeromq/cppzmq",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "name": "cppzmq",
+      "originator": "Organization: ZeroMQ",
+      "summary": "Header-only C++ binding for ZeroMQ (libzmq)",
+      "versionInfo": "4.11.0"
+    },
+    {
       "SPDXID": "SPDXRef-example",
       "checksums": [
         {
@@ -261,6 +275,12 @@
       "comment": "Example MPL 2.0 dependency"
     },
     {
+      "spdxElementId": "SPDXRef-example",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-cppzmq",
+      "comment": "Dynamically linked cppzmq C++ wrapper dependency"
+    },
+    {
       "spdxElementId": "SPDXRef-appsource",
       "relationshipType": "GENERATES",
       "relatedSpdxElement": "SPDXRef-example",
@@ -274,4 +294,3 @@
     }
   ]
 }
-

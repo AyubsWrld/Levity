@@ -8,8 +8,8 @@ target_include_directories(tsexecutor
   "${CMAKE_SOURCE_DIR}/include/package_registry")
 
 
+
 target_link_libraries(tsexecutor
   PUBLIC
-    tspredicate
-    tslocator
-    tspkgregistry)
+  tspredicate
+  tslocator)

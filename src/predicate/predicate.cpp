@@ -93,24 +93,23 @@ auto PredicateRegistry::RegisterPredicate(
     std::string suite_name, std::string name,
     std::unique_ptr<PredicateFactoryBase> factory)
     -> std::shared_ptr<PredicateInfo> {
-  auto predicate_info =
-      std::make_shared<PredicateInfo>(suite_name, name, std::move(factory));
-
   auto found = std::find_if(suites_.begin(), suites_.end(),
                             [&](const std::shared_ptr<PredicateSuite> &suite) {
                               return suite_name == suite->Name();
                             });
 
-  if (found != suites_.end()) {
-    (*found)->predicate_info_list_.push_back(predicate_info);
-  } else {
-    // TODO: see open question -- this implies a rule was declared for a
-    // suite name that InitializeLicensePredicateSuites never created.
-    auto suite = std::make_shared<PredicateSuite>(suite_name);
-    suite->predicate_info_list_.push_back(predicate_info);
-    suites_.push_back(std::move(suite));
+  if (found == suites_.end()) {
+    // All supported licenses are seeded by InitializeLicensePredicateSuites()
+    // before any predicate registers. Landing here means a typo, an
+    // unsupported license identifier, a license table missing an entry, or a
+    // registry initialization bug -- not a new license to silently create.
+    throw std::logic_error("attempted to register predicate " + name +
+                           " for unknown license identifier " + suite_name);
   }
 
+  auto predicate_info =
+      std::make_shared<PredicateInfo>(suite_name, name, std::move(factory));
+  (*found)->predicate_info_list_.push_back(predicate_info);
   return predicate_info;
 }
 
@@ -118,7 +117,7 @@ auto PredicateRegistry::GetPredicatesForLicense(
     std::string_view license_identifier) -> std::shared_ptr<PredicateSuite> {
   auto pred = [license_identifier](
                   const std::shared_ptr<PredicateSuite> &suite) -> bool {
-    return suite->LicenseInfo().name == license_identifier;
+    return suite->LicenseInfo().identifier == license_identifier;
   };
   if (auto suite = std::ranges::find_if(suites_, pred);
       suite != suites_.end()) {
@@ -134,9 +133,15 @@ auto PredicateRegistry::Print() -> void {
 }
 
 auto PredicateRegistry::InitializeLicensePredicateSuites() -> void {
+  // NOASSERTION isn't part of g_osi_licenses (it isn't an OSI-approved
+  // license), but existing predicates register under it as a catch-all, so
+  // seed it explicitly.
+  suites_.push_back(std::make_shared<PredicateSuite>(
+      std::string(ts::LicenseInfo{}.identifier), ts::LicenseInfo{}));
+
   for (const auto &license_info : g_osi_licenses) {
-    suites_.push_back(
-        std::make_shared<PredicateSuite>(license_info.name, license_info));
+    suites_.push_back(std::make_shared<PredicateSuite>(
+        std::string(license_info.identifier), license_info));
   }
 }
 

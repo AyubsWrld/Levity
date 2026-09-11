@@ -1,45 +1,40 @@
 #include "document.hpp"
 #include "get_args.hpp"
+
+#include "lgpl-inl.hpp"
+
 #include "parser.hpp"
-#include "predicate.hpp"
+
 #include "predicate_executor.hpp"
+#include "predicate.hpp"
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
-// all tests must be done using NOASSERTION until workaround for names exist.
-// NOTE: Point of Failure exists where grabbing the tests causes segfault ...
+// Placeholder checks applied to packages with no more specific predicate
+// suite (NOASSERTION). Real license-specific predicates, such as LGPL's
+// IsDynamicallyLinked in lgpl-inl.hpp, register under their own SPDX
+// identifier via TS_DECL_PREDICATE_FOR instead.
 
 TS_DECL_PREDICATE(NOASSERTION, IsStaticallyLinked) {
-  std::cout << "Testing IsStaticallyLinked" << std::endl;
   TS_EXPECT_TRUE(Context().package != nullptr);
   // placeholder condition we can swap for something else later
   TS_ASSERT_TRUE(true);
 }
 
-TS_DECL_PREDICATE(NOASSERTION, HasDefinedSource) {
-  std::cout << "Testing HasDefinedSource" << std::endl;
-  TS_ASSERT_TRUE(true);
-}
+TS_DECL_PREDICATE(NOASSERTION, HasDefinedSource) { TS_ASSERT_TRUE(true); }
+
+
+/* Date Time */ 
+/* Package Name */ 
+/* Package Version */ 
+/* Predicate */ 
+/* Pass/Failed? */ 
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-  ts::Executor e;
-  auto results = e.ExecuteAll();
-
-  for (const auto &result : results) {
-    std::cout << "Execution status: "
-              << (result.status == ts::ExecutionStatus::Passed ? "PASSED"
-                                                               : "FAILED")
-              << "\n";
-    for (const auto &r : result.predicate_results) {
-      std::cout << "  [" << (r.passed ? "PASS" : "FAIL") << "] "
-                << r.predicate_name;
-      if (!r.message.empty()) {
-        std::cout << " -- " << r.message;
-      }
-      std::cout << "\n";
-    }
-  }
-
-  return EXIT_SUCCESS;
+	ts::Executor e; // default ctor calls everything ...
+	auto results = e.ExecuteAll();
+	return EXIT_SUCCESS;
 }

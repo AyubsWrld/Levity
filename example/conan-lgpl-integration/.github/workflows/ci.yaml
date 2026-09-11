@@ -1,0 +1,52 @@
+name: Build Multi-Platform
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - runner: ubuntu-latest
+          - runner: ubuntu-22.04-arm
+            
+          # macOS builds
+          # - runner: macos-13      # Intel runner
+          - runner: macos-latest  # ARM64 runner (M1/M2)
+            
+          # Windows builds
+          - runner: windows-latest
+          - runner: windows-11-arm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Conan
+        uses: conan-io/setup-conan@v1
+        with:
+          cache_packages: true
+
+      - name: Build application
+        run: conan build . --build=missing -s compiler.cppstd=17
+

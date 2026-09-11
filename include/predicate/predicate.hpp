@@ -126,19 +126,17 @@ private:
 
 class [[nodiscard]] PredicateExecution {
 public:
+  PredicateExecution(std::shared_ptr<Package> package,
+                     std::shared_ptr<PredicateSuite> suite);
+
   auto Run() -> void;
   [[nodiscard]] auto Result() const noexcept
       -> const PredicateExecutionResult &;
 
 private:
-  PredicateExecution(std::shared_ptr<Package> package,
-                     std::shared_ptr<PredicateSuite> suite);
-
   std::shared_ptr<Package> package_;
   std::shared_ptr<PredicateSuite> suite_;
   PredicateExecutionResult result_;
-
-  friend class Executor;
 };
 
 class [[nodiscard]] PredicateRegistry {
@@ -168,24 +166,37 @@ private:
 #define TS_PREDICATE_NAME(library, name) library##_##name##_predicate
 #define TS_STRINGIZE(x) #x
 
-#define TS_DECL_PREDICATE(library, name)                                       \
-  static_assert(sizeof(TS_STRINGIZE(library)) > 0,                             \
-                "library must have non-zero length");                          \
+// TS_DECL_PREDICATE_FOR separates the C++ token used to manufacture the
+// generated class/variable names (which must be a valid identifier) from the
+// runtime SPDX license identifier used for suite lookup (which may contain
+// characters, such as '-' and '.', illegal in a C++ token). This is what lets
+// a suite like "LGPL-2.1-only" exist without forcing predicates to register
+// under NOASSERTION.
+//
+// The generated static member and out-of-class PredicateBody() definition are
+// `inline` so this macro is safe to expand from a header (e.g. lgpl-inl.hpp)
+// included from more than one translation unit -- #pragma once only guards
+// repeated inclusion within a single translation unit, not ODR violations
+// across several.
+#define TS_DECL_PREDICATE_FOR(library_token, license_identifier, name)        \
+  static_assert(sizeof(license_identifier) > 1,                               \
+                "license_identifier must have non-zero length");              \
   static_assert(sizeof(TS_STRINGIZE(name)) > 0,                                \
                 "name must have non-zero length");                             \
-  class [[nodiscard]] TS_PREDICATE_NAME(library, name)                         \
+  class [[nodiscard]] TS_PREDICATE_NAME(library_token, name)                   \
       : public ts::Predicate {                                                 \
   public:                                                                      \
-    TS_PREDICATE_NAME(library, name)() = default;                              \
-    TS_PREDICATE_NAME(library,                                                 \
-                      name)(const TS_PREDICATE_NAME(library,                   \
+    TS_PREDICATE_NAME(library_token, name)() = default;                       \
+    TS_PREDICATE_NAME(library_token,                                          \
+                      name)(const TS_PREDICATE_NAME(library_token,             \
                                                     name) &) = delete;         \
-    TS_PREDICATE_NAME(library,                                                 \
-                      name)(TS_PREDICATE_NAME(library, name) &&) = delete;     \
-    auto operator=(const TS_PREDICATE_NAME(library, name) &)                   \
-        -> TS_PREDICATE_NAME(library, name) & = delete;                        \
-    auto operator=(TS_PREDICATE_NAME(library, name) &&)                        \
-        -> TS_PREDICATE_NAME(library, name) & = delete;                        \
+    TS_PREDICATE_NAME(library_token,                                          \
+                      name)(TS_PREDICATE_NAME(library_token, name) &&) =      \
+        delete;                                                               \
+    auto operator=(const TS_PREDICATE_NAME(library_token, name) &)            \
+        -> TS_PREDICATE_NAME(library_token, name) & = delete;                 \
+    auto operator=(TS_PREDICATE_NAME(library_token, name) &&)                 \
+        -> TS_PREDICATE_NAME(library_token, name) & = delete;                 \
                                                                                \
     auto PredicateBody() -> void override;                                     \
                                                                                \
@@ -193,13 +204,21 @@ private:
     [[maybe_unused]] static std::shared_ptr<ts::PredicateInfo>                 \
         predicate_info_;                                                       \
   };                                                                           \
-  std::shared_ptr<ts::PredicateInfo> TS_PREDICATE_NAME(                        \
-      library, name)::predicate_info_ =                                        \
+  inline std::shared_ptr<ts::PredicateInfo> TS_PREDICATE_NAME(                 \
+      library_token, name)::predicate_info_ =                                  \
       ts::PredicateRegistry::GetInstance().RegisterPredicate(                  \
-          TS_STRINGIZE(library), TS_STRINGIZE(name),                           \
+          license_identifier, TS_STRINGIZE(name),                             \
           std::make_unique<                                                    \
-              ts::PredicateFactoryImpl<TS_PREDICATE_NAME(library, name)>>());  \
-  auto TS_PREDICATE_NAME(library, name)::PredicateBody() -> void
+              ts::PredicateFactoryImpl<TS_PREDICATE_NAME(library_token,        \
+                                                         name)>>());          \
+  inline auto TS_PREDICATE_NAME(library_token, name)::PredicateBody() -> void
+
+// Convenience wrapper for the common case where the license identifier is
+// already a valid C++ token (e.g. NOASSERTION, MIT). Identifiers containing
+// characters illegal in a C++ token (e.g. LGPL-2.1-only) must use
+// TS_DECL_PREDICATE_FOR directly.
+#define TS_DECL_PREDICATE(library, name)                                      \
+  TS_DECL_PREDICATE_FOR(library, TS_STRINGIZE(library), name)
 
 #define TS_ASSERT_TRUE(condition)                                              \
   do {                                                                         \

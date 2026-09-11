@@ -2,6 +2,8 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <filesystem>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -132,6 +134,23 @@ private:
 inline auto GetCommandLineArgs() -> const Arguments & {
   static const Arguments Args;
   return Args;
+}
+
+// argv[1] is the SBOM path (see PackageRegistry::PackageRegistry()); argv[2]
+// is the ELF binary that LGPL predicates such as IsDynamicallyLinked check
+// DT_NEEDED against. This is the same CLI-argument mechanism, just a second
+// index into it -- not a new global configuration path.
+[[nodiscard]] inline auto GetTargetBinaryPath()
+    -> std::optional<std::filesystem::path> {
+  const auto &args = GetCommandLineArgs();
+  if (args.Size() <= 2) {
+    return std::nullopt;
+  }
+  std::string_view raw = args.At(2).Native();
+  if (raw.empty()) {
+    return std::nullopt;
+  }
+  return std::filesystem::path(raw);
 }
 
 } // namespace ts::std_ext

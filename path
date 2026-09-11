@@ -1,0 +1,12 @@
+Execution status: PASSED
+  [PASS] IsStaticallyLinked
+  [PASS] HasDefinedSource
+Execution status: PASSED
+Execution status: PASSED
+Execution status: FAILED
+  [FAIL] IsDynamicallyLinked -- LGPL package "libiconv" was resolved, but none of its shared libraries (libcharset.so.1, libiconv.so.2) appear in the target's DT_NEEDED entries
+Execution status: PASSED
+Execution status: PASSED
+Execution status: PASSED
+  [PASS] IsStaticallyLinked
+  [PASS] HasDefinedSource

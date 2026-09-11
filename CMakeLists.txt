@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(align
+project(rbuff
   VERSION 0.1.0
   LANGUAGES C CXX
 )
@@ -14,6 +14,7 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/src/predicate")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src/package_registry")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src/executor")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src/locator")
+add_subdirectory("${CMAKE_SOURCE_DIR}/src/linkage")
 
 
 
@@ -23,11 +24,17 @@ add_executable(${CMAKE_PROJECT_NAME}
 
 target_include_directories(${CMAKE_PROJECT_NAME}
   PRIVATE
-  "${CMAKE_SOURCE_DIR}/include/parser")
+  "${CMAKE_SOURCE_DIR}/include/parser"
+  "${CMAKE_SOURCE_DIR}/include/rules")
+
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
   PRIVATE
-    tsparser
-    tsexecutor
-    tslocator
-)
+  tsparser
+  tspkgregistry
+  tslocator
+  tsexecutor
+  tslinkage)
+
+enable_testing()
+add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
