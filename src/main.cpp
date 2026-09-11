@@ -1,40 +1,34 @@
 #include "document.hpp"
 #include "get_args.hpp"
-
 #include "lgpl-inl.hpp"
-
 #include "parser.hpp"
-
-#include "predicate_executor.hpp"
 #include "predicate.hpp"
+#include "predicate_executor.hpp"
+#include "notifier.hpp"
 
 #include <cstdlib>
-#include <fstream>
+#include <chrono>
+#include <format>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
-// Placeholder checks applied to packages with no more specific predicate
-// suite (NOASSERTION). Real license-specific predicates, such as LGPL's
-// IsDynamicallyLinked in lgpl-inl.hpp, register under their own SPDX
-// identifier via TS_DECL_PREDICATE_FOR instead.
 
-TS_DECL_PREDICATE(NOASSERTION, IsStaticallyLinked) {
-  TS_EXPECT_TRUE(Context().package != nullptr);
-  // placeholder condition we can swap for something else later
-  TS_ASSERT_TRUE(true);
+
+// stub for exiting non-zero for gl-runner ...
+auto IsConformingProject(const std::vector<ts::PredicateExecutionResult>& results) -> bool {
+    bool isConformant = true;
+    for (const auto &result : results) {
+        for (const auto &r : result.predicate_results) {
+            !r.passed ? isConformant = false : isConformant = true;
+        }
+    }
+    return isConformant;
 }
 
-TS_DECL_PREDICATE(NOASSERTION, HasDefinedSource) { TS_ASSERT_TRUE(true); }
-
-
-/* Date Time */ 
-/* Package Name */ 
-/* Package Version */ 
-/* Predicate */ 
-/* Pass/Failed? */ 
-
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-	ts::Executor e; // default ctor calls everything ...
-	auto results = e.ExecuteAll();
-	return EXIT_SUCCESS;
+    ts::Executor e;
+    auto results = e.ExecuteAll();
+    WriteResultsToFile("dump.txt", results);
+    return IsConformingProject( results ) ? EXIT_SUCCESS : std::to_underlying( ts::EComplianceViolation::GenericComplianceFailure);
 }

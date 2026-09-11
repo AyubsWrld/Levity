@@ -58,19 +58,19 @@ auto PredicateSuite::LicenseInfo() const noexcept -> const ts::LicenseInfo & {
 }
 
 auto PredicateExecution::Run() -> void {
-  result_.predicate_results.clear();
-  result_.predicate_results.reserve(suite_->Predicates().size());
+    result_.predicate_results.clear();
+    result_.predicate_results.reserve(suite_->Predicates().size());
 
-  PackageContext ctx{package_, suite_->LicenseInfo(), false};
-
-  bool any_failed = false;
-  for (const auto &predicate_info : suite_->Predicates()) {
+    PackageContext ctx{package_, suite_->LicenseInfo(), false};
+    bool any_failed = false;
+    for (const auto &predicate_info : suite_->Predicates()) {
     PredicateResult r = predicate_info->Run(ctx);
+    r.pkg = ctx;
     any_failed = any_failed || !r.passed;
     result_.predicate_results.push_back(std::move(r));
-  }
+    }
 
-  result_.status =
+    result_.status =
       any_failed ? ExecutionStatus::Failed : ExecutionStatus::Passed;
 }
 

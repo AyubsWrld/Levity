@@ -76,14 +76,16 @@ public:
 enum class ExecutionStatus { NotRun, Passed, Failed };
 
 struct [[nodiscard]] PredicateResult {
-  std::string predicate_name;
-  bool passed;
-  std::string message;
+    std::string predicate_name;
+    bool passed;
+    std::string message;
+    PackageContext pkg;
 };
 
 struct [[nodiscard]] PredicateExecutionResult {
-  ExecutionStatus status{ExecutionStatus::NotRun};
-  std::vector<PredicateResult> predicate_results;
+    ExecutionStatus status{ExecutionStatus::NotRun};
+    PackageContext pkg_context;
+    std::vector<PredicateResult> predicate_results;
   // todo operator bool here ...
 };
 

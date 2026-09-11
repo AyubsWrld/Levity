@@ -22,7 +22,7 @@ auto Executor::BuildExecutionContext() -> void {
 }
 
 auto Executor::ExecuteAll() -> std::vector<PredicateExecutionResult> {
-  std::vector<PredicateExecutionResult> results;
+    std::vector<PredicateExecutionResult> results;
   results.reserve(execution_ctx_list_.size());
 
   for (auto &execution : execution_ctx_list_) {

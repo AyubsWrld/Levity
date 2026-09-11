@@ -7,6 +7,23 @@
 
 namespace ts {
 
+/* ... Error code that we emit ... */
+/* ... Report that we export ... */
+
+/*
+ * Keeping something that helps us distinguish between compliance failures vs.
+ * Program failures for use within CI.
+*/
+
+enum class EComplianceViolation {
+    GenericComplianceFailure = 1,
+    _max
+};
+
+struct ExecutionResult {
+    PackageContext ctx;
+    std::vector<PredicateExecutionResult> res;
+};
 class [[nodiscard]] Executor {
 public:
   Executor();
