@@ -1,0 +1,79 @@
+============================================================
+           FREEDOM TO OPERATE COMPLIANCE REPORT
+============================================================
+
+------------------------------------------------------------
+Package : conan.lock
+SPDX ID : SPDXRef-Application-e30d7f32678344e6
+License : NOASSERTION
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+------------------------------------------------------------
+Package : fmt
+SPDX ID : SPDXRef-Package-a0e96cd60aa7f424
+License : MIT
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+------------------------------------------------------------
+Package : gtest
+SPDX ID : SPDXRef-Package-b19f6e6b78c4b8bc
+License : BSD-3-Clause
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+------------------------------------------------------------
+Package : libiconv
+SPDX ID : SPDXRef-Package-2ff2fbee3662794f
+License : LGPL-2.1-or-later
+Status  : PASS
+
+Predicates:
+  [PASS] IsDynamicallyLinked
+
+------------------------------------------------------------
+Package : spdlog
+SPDX ID : SPDXRef-Package-499bac29978bf458
+License : MIT
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+------------------------------------------------------------
+Package : zlib
+SPDX ID : SPDXRef-Package-2eaa1ce1aeda5c2
+License : Zlib
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+------------------------------------------------------------
+Package : .
+SPDX ID : SPDXRef-Filesystem-1465386cfbe4e9c7
+License : NOASSERTION
+Status  : PASS
+
+Predicates:
+  No predicates executed.
+
+============================================================
+SUMMARY
+============================================================
+Packages checked : 7
+Packages passed  : 7  (100.0%)
+Packages failed  : 0  (0.0%)
+
+Predicates passed: 1  (100.0%)
+Predicates failed: 0  (0.0%)
+
+Overall status   : CONFORMING
+============================================================

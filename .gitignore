@@ -1,2 +1,17 @@
 build/*
 *.swp
+*:Zone.Identifier
+*.swp
+*.swo
+*.swn
+*.swm
+*:Zone.Identifier
+
+# Windows metadata
+*:Zone.Identifier
+
+# Vim swap files
+*.swp
+*.swo
+*.swn
+*.swm

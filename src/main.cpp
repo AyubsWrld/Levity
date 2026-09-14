@@ -1,10 +1,13 @@
 #include "document.hpp"
 #include "get_args.hpp"
-#include "lgpl-inl.hpp"
 #include "parser.hpp"
 #include "predicate.hpp"
+#include "reporter.hpp"
 #include "predicate_executor.hpp"
-#include "notifier.hpp"
+
+
+#include "lgpl-inl.hpp"
+#include "license_notice-inl.hpp"
 
 #include <cstdlib>
 #include <chrono>
@@ -26,9 +29,15 @@ auto IsConformingProject(const std::vector<ts::PredicateExecutionResult>& result
     return isConformant;
 }
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-    ts::Executor e;
-    auto results = e.ExecuteAll();
-    WriteResultsToFile("dump.txt", results);
-    return IsConformingProject( results ) ? EXIT_SUCCESS : std::to_underlying( ts::EComplianceViolation::GenericComplianceFailure);
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
+{
+    ts::Executor executor;
+    auto results = executor.ExecuteAll();
+
+    ts::WriteResultsToFile(results);
+
+    return IsConformingProject(results)
+               ? EXIT_SUCCESS
+               : std::to_underlying(
+                     ts::EComplianceViolation::GenericComplianceFailure);
 }

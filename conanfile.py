@@ -1,9 +1,7 @@
-"""Conan 2 recipe for the Tier 1 Slew-to-Cue MVP.
+"""Conan 2 recipe for the Freedom To Operate Template Repository
 
 Third-party C++ dependencies are managed exclusively through Conan 2 with exact, reviewed versions.
 Consumers use the ``CMakeDeps``/``CMakeToolchain`` generators and ``find_package()`` imported targets.
-
-Canonical developer workflow (see README.md):
 
     conan install . --output-folder=cmake-build-debug --build=missing \\
         -s build_type=Debug -s compiler.cppstd=23
@@ -27,6 +25,7 @@ class Edge_Isr_Platform(ConanFile):
         "cpp-httplib/0.30.0",
         "nlohmann_json/3.11.3",
         "gtest/1.18.0",
+        "openssl/4.0.1"
     )
 
     # CurveZMQ is not used: all Tier 1 IPC is local Unix-domain sockets inside one trust boundary.
