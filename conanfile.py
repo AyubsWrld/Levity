@@ -13,7 +13,7 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeDeps, CMakeToolchain
 
 
-class Platform(ConanFile):
+class Edge_Isr_Platform(ConanFile):
     name = "edge-isr-platform"
     version = "0.1.0"
     description = "Modular Edge ISR API Platform - Tier 1 Slew-to-Cue MVP"
@@ -27,7 +27,6 @@ class Platform(ConanFile):
         "cpp-httplib/0.30.0",
         "nlohmann_json/3.11.3",
         "gtest/1.18.0",
-        "libcurl/8.21.0"
     )
 
     # CurveZMQ is not used: all Tier 1 IPC is local Unix-domain sockets inside one trust boundary.
